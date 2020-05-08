@@ -6,144 +6,6 @@ let chartData = null;
 let dates = null;
 let heatmap_percentChange28DaysAgo = {};
 
-exports.getDates = () => {
-  return dates;
-};
-
-exports.initialize = async () => {
-  dates = {};
-  chartData = await getChartData();
-  dates.btcPrice = Object.keys(
-    chartData[categories.bitcoinInvestorTool][
-      datasetNames.bitcoinInvestorTool.btcPrice
-    ]
-  ).sort();
-  dates.twoYearMovingAverage = Object.keys(
-    chartData[categories.heatmap200WeekMovingAverage][
-      datasetNames.heatmap200WeekMovingAverage.twoHundredWeekMA
-    ]
-  ).sort();
-  for (const d of dates.twoYearMovingAverage) {
-    const pc = calcPercentChangeFrom28DaysAgo(d);
-    if (pc) {
-      heatmap_percentChange28DaysAgo[d] = pc;
-    }
-  }
-};
-
-const getPreviousDate = (date) => {
-  if (!dates.btcPrice.indexOf(date) || dates.btcPrice.indexOf(date) === 0) {
-    return null;
-  }
-  return dates.btcPrice[dates.btcPrice.indexOf(date) - 1];
-};
-
-exports.bitcoinInvestor_priceCrossesAbove2YearMA = (date) => {
-  // Entering overbought zone
-  const previousDate = getPreviousDate(date);
-  if (!previousDate) {
-    return false;
-  }
-  const investorToolData = chartData[categories.bitcoinInvestorTool];
-  const previousPrice =
-    investorToolData[datasetNames.bitcoinInvestorTool.btcPrice][previousDate];
-  const currentPrice =
-    investorToolData[datasetNames.bitcoinInvestorTool.btcPrice][date];
-  if (!previousPrice || !currentPrice) {
-    return false;
-  }
-  const twoYearMovingAverage =
-    investorToolData[datasetNames.bitcoinInvestorTool.twoYearMovingAverage][
-      date
-    ];
-  if (!twoYearMovingAverage) {
-    return false;
-  }
-  return (
-    previousPrice <= twoYearMovingAverage && currentPrice > twoYearMovingAverage
-  );
-};
-
-exports.bitcoinInvestor_priceCrossesBelow2YearMA = (date) => {
-  // Exiting overbought zone
-  const previousDate = getPreviousDate(date);
-  if (!previousDate) {
-    return false;
-  }
-  const investorToolData = chartData[categories.bitcoinInvestorTool];
-  const previousPrice =
-    investorToolData[datasetNames.bitcoinInvestorTool.btcPrice][previousDate];
-  const currentPrice =
-    investorToolData[datasetNames.bitcoinInvestorTool.btcPrice][date];
-  if (!previousPrice || !currentPrice) {
-    return false;
-  }
-  const twoYearMovingAverage =
-    investorToolData[datasetNames.bitcoinInvestorTool.twoYearMovingAverage][
-      date
-    ];
-  if (!twoYearMovingAverage) {
-    return false;
-  }
-  return (
-    previousPrice >= twoYearMovingAverage && currentPrice < twoYearMovingAverage
-  );
-};
-
-exports.bitcoinInvestor_priceCrossesAbove2YearMA_x5 = (date) => {
-  // Entering oversold zone
-  const previousDate = getPreviousDate(date);
-  if (!previousDate) {
-    return false;
-  }
-  const investorToolData = chartData[categories.bitcoinInvestorTool];
-  const previousPrice =
-    investorToolData[datasetNames.bitcoinInvestorTool.btcPrice][previousDate];
-  const currentPrice =
-    investorToolData[datasetNames.bitcoinInvestorTool.btcPrice][date];
-  if (!previousPrice || !currentPrice) {
-    return false;
-  }
-  const twoYearMovingAverage_x5 =
-    investorToolData[datasetNames.bitcoinInvestorTool.twoYearMovingAverage_x5][
-      date
-    ];
-  if (!twoYearMovingAverage_x5) {
-    return false;
-  }
-  return (
-    previousPrice <= twoYearMovingAverage_x5 &&
-    currentPrice > twoYearMovingAverage_x5
-  );
-};
-
-exports.bitcoinInvestor_priceCrossesBelow2YearMA_x5 = (date) => {
-  // Exiting oversold zone
-  const previousDate = getPreviousDate(date);
-  if (!previousDate) {
-    return false;
-  }
-  const investorToolData = chartData[categories.bitcoinInvestorTool];
-  const previousPrice =
-    investorToolData[datasetNames.bitcoinInvestorTool.btcPrice][previousDate];
-  const currentPrice =
-    investorToolData[datasetNames.bitcoinInvestorTool.btcPrice][date];
-  if (!previousPrice || !currentPrice) {
-    return false;
-  }
-  const twoYearMovingAverage_x5 =
-    investorToolData[datasetNames.bitcoinInvestorTool.twoYearMovingAverage_x5][
-      date
-    ];
-  if (!twoYearMovingAverage_x5) {
-    return false;
-  }
-  return (
-    previousPrice >= twoYearMovingAverage_x5 &&
-    currentPrice < twoYearMovingAverage_x5
-  );
-};
-
 const calcPercentChangeFrom28DaysAgo = (date) => {
   // Exiting overbought zone
   const heatmapData = chartData[categories.heatmap200WeekMovingAverage];
@@ -172,7 +34,205 @@ const calcPercentChangeFrom28DaysAgo = (date) => {
   return percentChange;
 };
 
-exports.heatmap200WeekMovingAverage_crossAbove14PercentMonthlyIncrease = (
+exports.getDates = () => {
+  return dates;
+};
+
+exports.initialize = async () => {
+  dates = {};
+  chartData = await getChartData();
+  dates.btcPrice = Object.keys(
+    chartData[categories.bitcoinInvestorTool][
+      datasetNames.bitcoinInvestorTool.btcPrice
+    ]
+  ).sort();
+  dates.twoYearMovingAverage = Object.keys(
+    chartData[categories.heatmap200WeekMovingAverage][
+      datasetNames.heatmap200WeekMovingAverage.twoHundredWeekMA
+    ]
+  ).sort();
+  for (const d of dates.twoYearMovingAverage) {
+    const pc = calcPercentChangeFrom28DaysAgo(d);
+    if (pc) {
+      heatmap_percentChange28DaysAgo[d] = pc;
+    }
+  }
+};
+
+const testTypes = {
+  bitcoinInvestor_priceCrossesAbove2YearMA:
+    "bitcoinInvestor_priceCrossesAbove2YearMA",
+  bitcoinInvestor_priceCrossesBelow2YearMA:
+    "bitcoinInvestor_priceCrossesBelow2YearMA",
+  bitcoinInvestor_priceCrossesAbove2YearMA_x5:
+    "bitcoinInvestor_priceCrossesAbove2YearMA_x5",
+  bitcoinInvestor_priceCrossesBelow2YearMA_x5:
+    "bitcoinInvestor_priceCrossesBelow2YearMA_x5",
+  heatmap200WeekMovingAverage_crossAbove14PercentMonthlyIncrease:
+    "heatmap200WeekMovingAverage_crossAbove14PercentMonthlyIncrease",
+  heatmap200WeekMovingAverage_crossBelow14PercentMonthlyIncrease:
+    "heatmap200WeekMovingAverage_crossBelow14PercentMonthlyIncrease",
+  heatmap200WeekMovingAverage_crossBelow200WMA:
+    "heatmap200WeekMovingAverage_crossBelow200WMA",
+  mvrvZScore_crossed: "mvrvZScore_crossed",
+  goldenRatio_crossed: "goldenRatio_crossed",
+  piCycleTop_crossed: "piCycleTop_crossed",
+  puellMultiple_crossed: "puellMultiple_crossed",
+  logarithmic_crossed: "logarithmic_crossed",
+  relativeUnrealized_crossed: "relativeUnrealized_crossed",
+};
+exports.testTypes = testTypes;
+
+exports.runIndicatorTest = (testType, date, criteria) => {
+  switch (testType) {
+    case testTypes.bitcoinInvestor_priceCrossesAbove2YearMA:
+      bitcoinInvestor_priceCrossesAbove2YearMA(date);
+      return;
+    case testTypes.bitcoinInvestor_priceCrossesBelow2YearMA:
+      return bitcoinInvestor_priceCrossesBelow2YearMA(date);
+    case testTypes.bitcoinInvestor_priceCrossesAbove2YearMA_x5:
+      return bitcoinInvestor_priceCrossesAbove2YearMA_x5(date);
+    case testTypes.bitcoinInvestor_priceCrossesBelow2YearMA_x5:
+      return bitcoinInvestor_priceCrossesBelow2YearMA_x5(date);
+    case testTypes.heatmap200WeekMovingAverage_crossAbove14PercentMonthlyIncrease:
+      return heatmap200WeekMovingAverage_crossAbove14PercentMonthlyIncrease(
+        date
+      );
+    case testTypes.heatmap200WeekMovingAverage_crossBelow14PercentMonthlyIncrease:
+      return heatmap200WeekMovingAverage_crossBelow14PercentMonthlyIncrease(
+        date
+      );
+    case testTypes.heatmap200WeekMovingAverage_crossBelow200WMA:
+      return heatmap200WeekMovingAverage_crossBelow200WMA(date);
+    case testTypes.mvrvZScore_crossed:
+      return mvrvZScore_crossed(date, criteria);
+    case testTypes.goldenRatio_crossed:
+      return goldenRatio_crossed(date, criteria);
+    case testTypes.piCycleTop_crossed:
+      return piCycleTop_crossed(date);
+    case testTypes.puellMultiple_crossed:
+      return puellMultiple_crossed(date, criteria);
+    case testTypes.logarithmic_crossed:
+      return logarithmic_crossed(date, criteria);
+    case testTypes.relativeUnrealized_crossed:
+      return relativeUnrealized_crossed(date, criteria);
+  }
+};
+
+const getPreviousDate = (date) => {
+  if (!dates.btcPrice.indexOf(date) || dates.btcPrice.indexOf(date) === 0) {
+    return null;
+  }
+  return dates.btcPrice[dates.btcPrice.indexOf(date) - 1];
+};
+
+const bitcoinInvestor_priceCrossesAbove2YearMA = (date) => {
+  // Entering overbought zone
+  const previousDate = getPreviousDate(date);
+  if (!previousDate) {
+    return false;
+  }
+  const investorToolData = chartData[categories.bitcoinInvestorTool];
+  const previousPrice =
+    investorToolData[datasetNames.bitcoinInvestorTool.btcPrice][previousDate];
+  const currentPrice =
+    investorToolData[datasetNames.bitcoinInvestorTool.btcPrice][date];
+  if (!previousPrice || !currentPrice) {
+    return false;
+  }
+  const twoYearMovingAverage =
+    investorToolData[datasetNames.bitcoinInvestorTool.twoYearMovingAverage][
+      date
+    ];
+  if (!twoYearMovingAverage) {
+    return false;
+  }
+  return (
+    previousPrice <= twoYearMovingAverage && currentPrice > twoYearMovingAverage
+  );
+};
+
+const bitcoinInvestor_priceCrossesBelow2YearMA = (date) => {
+  // Exiting overbought zone
+  const previousDate = getPreviousDate(date);
+  if (!previousDate) {
+    return false;
+  }
+  const investorToolData = chartData[categories.bitcoinInvestorTool];
+  const previousPrice =
+    investorToolData[datasetNames.bitcoinInvestorTool.btcPrice][previousDate];
+  const currentPrice =
+    investorToolData[datasetNames.bitcoinInvestorTool.btcPrice][date];
+  if (!previousPrice || !currentPrice) {
+    return false;
+  }
+  const twoYearMovingAverage =
+    investorToolData[datasetNames.bitcoinInvestorTool.twoYearMovingAverage][
+      date
+    ];
+  if (!twoYearMovingAverage) {
+    return false;
+  }
+  return (
+    previousPrice >= twoYearMovingAverage && currentPrice < twoYearMovingAverage
+  );
+};
+
+const bitcoinInvestor_priceCrossesAbove2YearMA_x5 = (date) => {
+  // Entering oversold zone
+  const previousDate = getPreviousDate(date);
+  if (!previousDate) {
+    return false;
+  }
+  const investorToolData = chartData[categories.bitcoinInvestorTool];
+  const previousPrice =
+    investorToolData[datasetNames.bitcoinInvestorTool.btcPrice][previousDate];
+  const currentPrice =
+    investorToolData[datasetNames.bitcoinInvestorTool.btcPrice][date];
+  if (!previousPrice || !currentPrice) {
+    return false;
+  }
+  const twoYearMovingAverage_x5 =
+    investorToolData[datasetNames.bitcoinInvestorTool.twoYearMovingAverage_x5][
+      date
+    ];
+  if (!twoYearMovingAverage_x5) {
+    return false;
+  }
+  return (
+    previousPrice <= twoYearMovingAverage_x5 &&
+    currentPrice > twoYearMovingAverage_x5
+  );
+};
+
+const bitcoinInvestor_priceCrossesBelow2YearMA_x5 = (date) => {
+  // Exiting oversold zone
+  const previousDate = getPreviousDate(date);
+  if (!previousDate) {
+    return false;
+  }
+  const investorToolData = chartData[categories.bitcoinInvestorTool];
+  const previousPrice =
+    investorToolData[datasetNames.bitcoinInvestorTool.btcPrice][previousDate];
+  const currentPrice =
+    investorToolData[datasetNames.bitcoinInvestorTool.btcPrice][date];
+  if (!previousPrice || !currentPrice) {
+    return false;
+  }
+  const twoYearMovingAverage_x5 =
+    investorToolData[datasetNames.bitcoinInvestorTool.twoYearMovingAverage_x5][
+      date
+    ];
+  if (!twoYearMovingAverage_x5) {
+    return false;
+  }
+  return (
+    previousPrice >= twoYearMovingAverage_x5 &&
+    currentPrice < twoYearMovingAverage_x5
+  );
+};
+
+const heatmap200WeekMovingAverage_crossAbove14PercentMonthlyIncrease = (
   date
 ) => {
   const previousDate = getPreviousDate(date);
@@ -191,7 +251,7 @@ exports.heatmap200WeekMovingAverage_crossAbove14PercentMonthlyIncrease = (
   return crossedAbove;
 };
 
-exports.heatmap200WeekMovingAverage_crossBelow14PercentMonthlyIncrease = (
+const heatmap200WeekMovingAverage_crossBelow14PercentMonthlyIncrease = (
   date
 ) => {
   const previousDate = getPreviousDate(date);
@@ -210,7 +270,7 @@ exports.heatmap200WeekMovingAverage_crossBelow14PercentMonthlyIncrease = (
   return crossedBelow;
 };
 
-exports.heatmap200WeekMovingAverage_crossBelow200WMA = (date) => {
+const heatmap200WeekMovingAverage_crossBelow200WMA = (date) => {
   const previousDate = getPreviousDate(date);
   if (!previousDate) {
     return false;
@@ -244,9 +304,8 @@ const mvrvCriteria = {
   enteringExtremeOversold: "enteringExtremeOversold",
   exitingExtremeOversold: "exitingExtremeOversold",
 };
-
 exports.mvrvCriteria = mvrvCriteria;
-exports.mvrvZScore_crossed = (date, criteria) => {
+const mvrvZScore_crossed = (date, criteria) => {
   const previousDate = getPreviousDate(date);
   if (!previousDate) {
     return false;
@@ -277,10 +336,12 @@ exports.mvrvZScore_crossed = (date, criteria) => {
   }
 };
 
-exports.goldenRatio_crossed = (date, x2, x3) => {
-  if (x2 === x3) {
-    throw "x2 OR x3 should be true, not both";
-  }
+const goldenRatioCriteria = {
+  enteringOverbought: "enteringOverbought",
+  reachingPotentialCycleHighZone: "reachingPotentialCycleHighZone",
+};
+exports.goldenRatioCriteria = goldenRatioCriteria;
+const goldenRatio_crossed = (date, criteria) => {
   const previousDate = getPreviousDate(date);
   if (!previousDate) {
     return false;
@@ -295,18 +356,19 @@ exports.goldenRatio_crossed = (date, x2, x3) => {
   if (!previousPrice || !currentPrice || !current350DMA) {
     return false;
   }
-  if (x2) {
+  if (criteria === goldenRatioCriteria.enteringOverbought) {
     const crossed =
       previousPrice < current350DMA * 2 && currentPrice >= current350DMA * 2;
     return crossed;
   } else {
+    //reachingPotentialCycleHighZone
     const crossed =
       previousPrice < current350DMA * 3 && currentPrice >= current350DMA * 3;
     return crossed;
   }
 };
 
-exports.piCycleTop_crossed = (date) => {
+const piCycleTop_crossed = (date) => {
   const previousDate = getPreviousDate(date);
   if (!previousDate) {
     return false;
@@ -332,7 +394,7 @@ const puellCriteria = {
   exitingOversold: "exitingOversold",
 };
 exports.puellCriteria = puellCriteria;
-exports.puellMultiple_crossed = (date, criteria) => {
+const puellMultiple_crossed = (date, criteria) => {
   const previousDate = getPreviousDate(date);
   if (!previousDate) {
     return false;
@@ -370,7 +432,7 @@ const logarithmicCriteria = {
   exitingOversold: "exitingOversold",
 };
 exports.logarithmicCriteria = logarithmicCriteria;
-exports.logarithmic_crossed = (date, criteria) => {
+const logarithmic_crossed = (date, criteria) => {
   const previousDate = getPreviousDate(date);
   if (!previousDate) {
     return false;
@@ -424,7 +486,7 @@ const relativeUnrealizedCriteria = {
   enteringGreed: "enteringGreed",
 };
 exports.relativeUnrealizedCriteria = relativeUnrealizedCriteria;
-exports.relativeUnrealized_crossed = (date, criteria) => {
+const relativeUnrealized_crossed = (date, criteria) => {
   const previousDate = getPreviousDate(date);
   if (!previousDate) {
     return false;

@@ -1,0 +1,25 @@
+{
+  "name": "LookIntoBitcoinAnalysis",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kboudy/LookIntoBitcoinAnalysis.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kboudy/LookIntoBitcoinAnalysis/issues"
+  },
+  "homepage": "https://github.com/kboudy/LookIntoBitcoinAnalysis#readme",
+  "dependencies": {
+    "axios": "^0.19.2",
+    "jszip": "^3.4.0",
+    "lodash": "^4.17.15"
+  }
+}

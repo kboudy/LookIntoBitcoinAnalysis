@@ -1,59 +1,137 @@
 const _ = require("lodash"),
   axios = require("axios"),
+  moment = require("moment"),
   JSZip = require("jszip"),
   fs = require("fs");
 
+const urlKeys = {
+  relativeUnrealisedProfitLoss: "unrealised_profit_loss",
+  marketCycleMA: "market_cycle_ma",
+  twoHundredWeekMAHeatmap: "200wma_heatmap",
+  mvrvZScore: "mvrv_zscore",
+  goldenRatio: "golden_ratio",
+  piCycleTopIndicator: "pi_cycle_top_indicator",
+  puellMultiple: "puell_multiple",
+  logLogRegression: "log_log_regression",
+};
+
+const datasetNames = {
+  relativeUnrealisedProfitLoss: {
+    btcPrice: "BTC Price",
+    relativeUnrealizedProfitLoss: "Relative Unrealised Profit/Loss",
+  },
+  bitcoinInvestorTool: {
+    btcPrice: "BTC Price",
+    twoYearMovingAverage: "2 Year Moving Average",
+    twoYearMovingAverage_x5: "2 Year Moving Average x 5",
+  },
+  heatmap200WeekMovingAverage: {
+    btcPrice: "BTC Price",
+    percentMonthlyIncreaseOf200WeekMA:
+      "% Monthly Increase Of 200 Week Moving Average",
+    twoHundredWeekMA: "200 Week Moving Average",
+  },
+  mvrvZscore: {
+    zScore: "Z-Score",
+  },
+  goldenRatioMultiplier: {
+    btcPrice: "BTC Price",
+    price350DMA: "Price 350DMA",
+  },
+  piCycleTop: {
+    btcPrice: "BTC Price",
+    price111DMA: "Price 111DMA",
+    price350DMA_x2: "Price 350DMA x 2",
+  },
+  puellMultiple: {
+    btcPrice: "BTC Price",
+    puellMultiple: "Puell Multiple",
+  },
+  logarithmicGrowthCurve: {
+    btcPrice: "BTC Price",
+    highDev: "HighDev",
+    fib9098Dev: "Fib9098Dev",
+    fib8541Dev: "Fib8541Dev",
+    fib7639Dev: "Fib7639Dev",
+    fib618Dev: "Fib618Dev",
+    midDev: "MidDev",
+    fib382Dev: "Fib382Dev",
+    fib2361Dev: "Fib2361Dev",
+    fib1459Dev: "Fib1459Dev",
+    fib0902Dev: "Fib0902Dev",
+    lowDev: "LowDev",
+    oscillator: "Oscillator",
+  },
+};
+
 const chartDataFetchInfo = {
   relativeUnrealisedProfitLoss: {
-    urlKey: "unrealised_profit_loss",
-    dataToKeep: ["BTC Price", "Relative Unrealised Profit/Loss"],
+    urlKey: urlKeys.relativeUnrealisedProfitLoss,
+    dataToKeep: [
+      datasetNames.relativeUnrealisedProfitLoss.btcPrice,
+      datasetNames.relativeUnrealisedProfitLoss.relativeUnrealizedProfitLoss,
+    ],
   },
 
   bitcoinInvestorTool: {
-    urlKey: "market_cycle_ma",
+    urlKey: urlKeys.marketCycleMA,
     dataToKeep: [
-      "BTC Price",
-      "2 Year Moving Average x 5",
-      "2 Year Moving Average",
+      datasetNames.bitcoinInvestorTool.btcPrice,
+      datasetNames.bitcoinInvestorTool.twoYearMovingAverage_x5,
+      datasetNames.bitcoinInvestorTool.twoYearMovingAverage,
     ],
   },
   heatmap200WeekMovingAverage: {
-    urlKey: "200wma_heatmap",
+    urlKey: urlKeys.twoHundredWeekMAHeatmap,
     dataToKeep: [
-      "BTC Price",
-      "% Monthly Increase Of 200 Week Moving Average",
-      "200 Week Moving Average",
+      datasetNames.heatmap200WeekMovingAverage.btcPrice,
+      datasetNames.heatmap200WeekMovingAverage
+        .percentMonthlyIncreaseOf200WeekMA,
+      datasetNames.heatmap200WeekMovingAverage.twoHundredWeekMA,
     ],
   },
-  mvrvZscore: { urlKey: "mvrv_zscore", dataToKeep: ["Z-Score"] },
+  mvrvZscore: {
+    urlKey: urlKeys.mvrvZScore,
+    dataToKeep: [datasetNames.mvrvZscore.zScore],
+  },
   goldenRatioMultiplier: {
-    urlKey: "golden_ratio",
-    dataToKeep: ["BTC Price", "Price 350DMA"],
+    urlKey: urlKeys.goldenRatio,
+    dataToKeep: [
+      datasetNames.goldenRatioMultiplier.btcPrice,
+      datasetNames.goldenRatioMultiplier.price350DMA,
+    ],
   },
   piCycleTop: {
-    urlKey: "pi_cycle_top_indicator",
-    dataToKeep: ["BTC Price", "Price 111DMA", "Price 350DMA x 2"],
+    urlKey: urlKeys.piCycleTopIndicator,
+    dataToKeep: [
+      datasetNames.piCycleTop.btcPrice,
+      datasetNames.piCycleTop.price111DMA,
+      datasetNames.piCycleTop.price350DMA_x2,
+    ],
   },
   puellMultiple: {
-    urlKey: "puell_multiple",
-    dataToKeep: ["BTC Price", "Puell Multiple"],
+    urlKey: urlKeys.puellMultiple,
+    dataToKeep: [
+      datasetNames.puellMultiple.btcPrice,
+      datasetNames.puellMultiple.puellMultiple,
+    ],
   },
   logarithmicGrowthCurve: {
-    urlKey: "log_log_regression",
+    urlKey: urlKeys.logLogRegression,
     dataToKeep: [
-      "BTC Price",
-      "HighDev",
-      "Fib9098Dev",
-      "Fib8541Dev",
-      "Fib7639Dev",
-      "Fib618Dev",
-      "MidDev",
-      "Fib382Dev",
-      "Fib2361Dev",
-      "Fib1459Dev",
-      "Fib0902Dev",
-      "LowDev",
-      "Oscillator",
+      datasetNames.logarithmicGrowthCurve.btcPrice,
+      datasetNames.logarithmicGrowthCurve.highDev,
+      datasetNames.logarithmicGrowthCurve.fib9098Dev,
+      datasetNames.logarithmicGrowthCurve.fib8541Dev,
+      datasetNames.logarithmicGrowthCurve.fib7639Dev,
+      datasetNames.logarithmicGrowthCurve.fib618Dev,
+      datasetNames.logarithmicGrowthCurve.midDev,
+      datasetNames.logarithmicGrowthCurve.fib382Dev,
+      datasetNames.logarithmicGrowthCurve.fib2361Dev,
+      datasetNames.logarithmicGrowthCurve.fib1459Dev,
+      datasetNames.logarithmicGrowthCurve.fib0902Dev,
+      datasetNames.logarithmicGrowthCurve.lowDev,
+      datasetNames.logarithmicGrowthCurve.oscillator,
     ],
   },
 };
@@ -70,17 +148,16 @@ const downloadChartData = async () => {
     chartData[ctName] = {};
     for (const rrd of rawResponseData) {
       if (ctObj.dataToKeep.includes(rrd.name)) {
-        chartData[ctName][rrd.name] = {};
-        chartData[ctName][rrd.name].x = rrd.x;
-        chartData[ctName][rrd.name].y = rrd.y;
-        if (
-          chartData[ctName][rrd.name].x.length >
-          chartData[ctName][rrd.name].y.length
-        ) {
-          chartData[ctName][rrd.name].x = chartData[ctName][rrd.name].x.slice(
-            0,
-            chartData[ctName][rrd.name].y.length
-          );
+        const dataCollection = {};
+        chartData[ctName][rrd.name] = dataCollection;
+        let dateStrings = rrd.x;
+        let yValues = rrd.y;
+        if (dateStrings.length > yValues.length) {
+          dateStrings = dateStrings.slice(0, yValues.length);
+        }
+        for (let i = 0; i < dateStrings.length; i++) {
+          const mDate = moment(dateStrings[i].slice(0, 10), "YYYY-MM-DD");
+          dataCollection[mDate.format("YYYY-MM-DD")] = yValues[i];
         }
       }
     }
@@ -116,7 +193,7 @@ const extractChartDataFromZip = async () => {
 };
 
 (async () => {
-  //await downloadChartData();
-  const chartData = await extractChartDataFromZip();
+  await downloadChartData();
+  //const chartData = await extractChartDataFromZip();
   debugger;
 })();

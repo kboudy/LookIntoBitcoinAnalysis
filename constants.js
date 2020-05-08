@@ -8,7 +8,18 @@ const urlKeys = {
   puellMultiple: "puell_multiple",
   logLogRegression: "log_log_regression",
 };
-exports.urlKeys = urlKeys;
+
+const categories = {
+  relativeUnrealisedProfitLoss: "relativeUnrealisedProfitLoss",
+  bitcoinInvestorTool: "bitcoinInvestorTool",
+  heatmap200WeekMovingAverage: "heatmap200WeekMovingAverage",
+  mvrvZScore: "mvrvZscore",
+  goldenRatioMultiplier: "goldenRatioMultiplier",
+  piCycleTop: "piCycleTop",
+  puellMultiple: "puellMultiple",
+  logarithmicGrowthCurve: "logarithmicGrowthCurve",
+};
+exports.categories = categories;
 
 const datasetNames = {
   relativeUnrealisedProfitLoss: {

@@ -1,9 +1,15 @@
 const _ = require("lodash"),
-  { downloadChartData, extractChartDataFromZip } = require("./dataUtils"),
-  { chartDataFetchInfo } = require("./constants");
+  { downloadChartData, getChartData } = require("./dataUtils"),
+  { chartDataFetchInfo } = require("./constants"),
+  indicatorTests = require("./indicatorTests");
 
 (async () => {
   //await downloadChartData();
-  const chartData = await extractChartDataFromZip();
-  debugger;
+  await indicatorTests.initialize();
+  const dates = indicatorTests.getDates().btcPrice;
+  for (const d of dates)
+    await indicatorTests.relativeUnrealized_crossed(
+      d,
+      indicatorTests.relativeUnrealizedCriteria.enteringCapitulation
+    );
 })();

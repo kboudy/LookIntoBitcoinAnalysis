@@ -5,6 +5,8 @@ const _ = require("lodash"),
   fs = require("fs"),
   { chartDataFetchInfo } = require("./constants");
 
+let chartData = null;
+
 exports.downloadChartData = async () => {
   const chartData = {};
   for (const ctName of Object.keys(chartDataFetchInfo)) {
@@ -48,7 +50,7 @@ exports.downloadChartData = async () => {
     });
 };
 
-exports.extractChartDataFromZip = async () => {
+const extractChartDataFromZip = async () => {
   return new Promise((resolve, reject) => {
     fs.readFile("chartData.zip", async (err, data) => {
       if (err) reject(err);
@@ -59,4 +61,11 @@ exports.extractChartDataFromZip = async () => {
       resolve(chartData);
     });
   });
+};
+
+exports.getChartData = async () => {
+  if (!chartData) {
+    chartData = await extractChartDataFromZip();
+  }
+  return chartData;
 };

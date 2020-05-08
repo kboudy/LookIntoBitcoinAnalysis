@@ -9,7 +9,7 @@ const _ = require("lodash"),
   const dates = indicatorTests.getDates().btcPrice;
   for (const d of dates)
     await indicatorTests.runIndicatorTest(
-      indicatorTests.testTypes.relativeUnrealized_crossed,
+      indicatorTests.testTypes.relativeUnrealized,
       d,
       indicatorTests.relativeUnrealizedCriteria.enteringCapitulation
     );

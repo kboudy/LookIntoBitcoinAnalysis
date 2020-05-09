@@ -6,6 +6,18 @@ let chartData = null;
 let dates = null;
 let heatmap_percentChange28DaysAgo = {};
 
+const testTypes = {
+  bitcoinInvestor: "bitcoinInvestor",
+  heatmap200WeekMovingAverage: "heatmap200WeekMovingAverage",
+  mvrvZScore: "mvrvZScore",
+  goldenRatio: "goldenRatio",
+  piCycleTop: "piCycleTop",
+  puellMultiple: "puellMultiple",
+  logarithmic: "logarithmic",
+  relativeUnrealized: "relativeUnrealized",
+};
+exports.testTypes = testTypes;
+
 const calcPercentChangeFrom28DaysAgo = (date) => {
   // Exiting overbought zone
   const heatmapData = chartData[categories.heatmap200WeekMovingAverage];
@@ -58,18 +70,6 @@ exports.initialize = async () => {
     }
   }
 };
-
-const testTypes = {
-  bitcoinInvestor: "bitcoinInvestor",
-  heatmap200WeekMovingAverage: "heatmap200WeekMovingAverage",
-  mvrvZScore: "mvrvZScore",
-  goldenRatio: "goldenRatio",
-  piCycleTop: "piCycleTop",
-  puellMultiple: "puellMultiple",
-  logarithmic: "logarithmic",
-  relativeUnrealized: "relativeUnrealized",
-};
-exports.testTypes = testTypes;
 
 exports.runIndicatorTest = (date, testType, criteria) => {
   switch (testType) {
@@ -203,7 +203,7 @@ const heatmap200WeekMovingAverage = (date, criteria) => {
   }
 };
 
-const mvrvCriteria = {
+const mvrvScoreCriteria = {
   enteringOverbought: "enteringOverbought",
   exitingOverbought: "exitingOverbought",
   enteringExtremeOverbought: "enteringExtremeOverbought",
@@ -213,7 +213,7 @@ const mvrvCriteria = {
   enteringExtremeOversold: "enteringExtremeOversold",
   exitingExtremeOversold: "exitingExtremeOversold",
 };
-exports.mvrvCriteria = mvrvCriteria;
+exports.mvrvScoreCriteria = mvrvScoreCriteria;
 const mvrvZScore = (date, criteria) => {
   const previousDate = getPreviousDate(date);
   if (!previousDate) {
@@ -226,21 +226,21 @@ const mvrvZScore = (date, criteria) => {
     return false;
   }
   switch (criteria) {
-    case mvrvCriteria.enteringOverbought:
+    case mvrvScoreCriteria.enteringOverbought:
       return previousZScore < 7.5 && currentZScore >= 7.5;
-    case mvrvCriteria.exitingOverbought:
+    case mvrvScoreCriteria.exitingOverbought:
       return previousZScore > 7.5 && currentZScore <= 7.5;
-    case mvrvCriteria.enteringExtremeOverbought:
+    case mvrvScoreCriteria.enteringExtremeOverbought:
       return previousZScore < 9 && currentZScore >= 9;
-    case mvrvCriteria.exitingExtremeOverbought:
+    case mvrvScoreCriteria.exitingExtremeOverbought:
       return previousZScore > 9 && currentZScore <= 9;
-    case mvrvCriteria.enteringOversold:
+    case mvrvScoreCriteria.enteringOversold:
       return previousZScore > 0.1 && currentZScore <= 0.1;
-    case mvrvCriteria.exitingOversold:
+    case mvrvScoreCriteria.exitingOversold:
       return previousZScore < 0.1 && currentZScore >= 0.1;
-    case mvrvCriteria.enteringExtremeOversold:
+    case mvrvScoreCriteria.enteringExtremeOversold:
       return previousZScore > -0.4 && currentZScore <= -0.4;
-    case mvrvCriteria.exitingExtremeOversold:
+    case mvrvScoreCriteria.exitingExtremeOversold:
       return previousZScore < -0.4 && currentZScore >= -0.4;
   }
 };
@@ -296,13 +296,13 @@ const piCycleTop = (date) => {
   return crossed;
 };
 
-const puellCriteria = {
+const puellMultipleCriteria = {
   enteringOverbought: "enteringOverbought",
   exitingOverbought: "exitingOverbought",
   enteringOversold: "enteringOversold",
   exitingOversold: "exitingOversold",
 };
-exports.puellCriteria = puellCriteria;
+exports.puellMultipleCriteria = puellMultipleCriteria;
 const puellMultiple = (date, criteria) => {
   const previousDate = getPreviousDate(date);
   if (!previousDate) {
@@ -317,16 +317,16 @@ const puellMultiple = (date, criteria) => {
     return false;
   }
   switch (criteria) {
-    case mvrvCriteria.enteringOverbought:
+    case mvrvScoreCriteria.enteringOverbought:
       const enteringOverbought = previousPuell < 4 && currentPuell >= 4;
       return enteringOverbought;
-    case mvrvCriteria.exitingOverbought:
+    case mvrvScoreCriteria.exitingOverbought:
       const exitingOverbought = previousPuell > 4 && currentPuell <= 4;
       return exitingOverbought;
-    case mvrvCriteria.enteringOversold:
+    case mvrvScoreCriteria.enteringOversold:
       const enteringOversold = previousPuell > 0.5 && currentPuell <= 0.5;
       return enteringOversold;
-    case mvrvCriteria.exitingOversold:
+    case mvrvScoreCriteria.exitingOversold:
       const exitingOversold = previousPuell < 0.5 && currentPuell >= 0.5;
       return exitingOversold;
   }
@@ -436,3 +436,234 @@ const relativeUnrealized = (date, criteria) => {
       return enteringGreed;
   }
 };
+
+exports.testCriteriaCombinations = {
+  bitcoinInvestor_enteringOverbought: [
+    {
+      testType: testTypes.bitcoinInvestor,
+      criteria: bitcoinInvestorCriteria.enteringOverbought,
+      bullish: false,
+      daysSince: [0, 5],
+    },
+    null,
+  ],
+  bitcoinInvestor_enteringOversold: [
+    {
+      testType: testTypes.bitcoinInvestor,
+      criteria: bitcoinInvestorCriteria.enteringOversold,
+      bullish: true,
+      daysSince: [0, 5],
+    },
+    null,
+  ],
+  heatmap200WeekMovingAverage_enteringOverbought: [
+    {
+      testType: testTypes.heatmap200WeekMovingAverage,
+      criteria: heatmap200WeekCriteria.enteringOverbought,
+      bullish: false,
+      daysSince: [0, 5],
+    },
+    null,
+  ],
+
+  heatmap200WeekMovingAverage_enteringOversold: [
+    {
+      testType: testTypes.heatmap200WeekMovingAverage,
+      criteria: heatmap200WeekCriteria.enteringOversold,
+      bullish: true,
+      daysSince: [0, 5],
+    },
+    null,
+  ],
+
+  mvrvZScore_enteringOverbought: [
+    {
+      testType: testTypes.mvrvZScore,
+      criteria: mvrvScoreCriteria.enteringOverbought,
+      bullish: false,
+      daysSince: [0, 5],
+    },
+    null,
+  ],
+  mvrvZScore_enteringExtremeOverbought: [
+    {
+      testType: testTypes.mvrvZScore,
+      criteria: mvrvScoreCriteria.enteringExtremeOverbought,
+      bullish: false,
+      daysSince: [0, 5],
+    },
+    null,
+  ],
+  mvrvZScore_enteringOversold: [
+    {
+      testType: testTypes.mvrvZScore,
+      criteria: mvrvScoreCriteria.enteringOversold,
+      bullish: true,
+      daysSince: [0, 5],
+    },
+    null,
+  ],
+  mvrvZScore_enteringExtremeOversold: [
+    {
+      testType: testTypes.mvrvZScore,
+      criteria: mvrvScoreCriteria.enteringExtremeOversold,
+      bullish: true,
+      daysSince: [0, 5],
+    },
+    null,
+  ],
+  goldenRatio_enteringOverbought: [
+    {
+      testType: testTypes.goldenRatio,
+      criteria: goldenRatioCriteria.enteringExtremeOversold,
+      bullish: false,
+      daysSince: [0, 5],
+    },
+    null,
+  ],
+  goldenRatio_reachingPotentialCycleHighZone: [
+    {
+      testType: testTypes.goldenRatio,
+      criteria: goldenRatioCriteria.reachingPotentialCycleHighZone,
+      bullish: false,
+      daysSince: [0, 5],
+    },
+    null,
+  ],
+  piCycleTop: [
+    {
+      testType: testTypes.piCycleTop,
+      criteria: null,
+      bullish: false,
+      daysSince: [0, 5],
+    },
+    null,
+  ],
+  puellMultiple_enteringOverbought: [
+    {
+      testType: testTypes.puellMultiple,
+      criteria: puellMultipleCriteria.enteringOverbought,
+      bullish: false,
+      daysSince: [0, 5],
+    },
+    null,
+  ],
+  puellMultiple_enteringOversold: [
+    {
+      testType: testTypes.puellMultiple,
+      criteria: puellMultipleCriteria.enteringOversold,
+      bullish: true,
+      daysSince: [0, 5],
+    },
+    null,
+  ],
+  logarithmic_enteringOverbought: [
+    {
+      testType: testTypes.logarithmic,
+      criteria: logarithmicCriteria.enteringOverbought,
+      bullish: false,
+      daysSince: [0, 5],
+    },
+    null,
+  ],
+  logarithmic_enteringOversold: [
+    {
+      testType: testTypes.logarithmic,
+      criteria: logarithmicCriteria.enteringOversold,
+      bullish: true,
+      daysSince: [0, 5],
+    },
+    null,
+  ],
+  relativeUnrealized_enteringCapitulation: [
+    {
+      testType: testTypes.logarithmic,
+      criteria: logarithmicCriteria.enteringCapitulation,
+      bullish: true,
+      daysSince: [0, 5],
+    },
+    null,
+  ],
+  relativeUnrealized_enteringGreed: [
+    {
+      testType: testTypes.logarithmic,
+      criteria: logarithmicCriteria.enteringGreed,
+      bullish: false,
+      daysSince: [0, 5],
+    },
+    null,
+  ],
+};
+
+// {
+//   testType: testTypes.bitcoinInvestor,
+//   criteria: bitcoinInvestorCriteria.exitingOverbought,
+// },
+// {
+//   testType: testTypes.bitcoinInvestor,
+//   criteria: bitcoinInvestorCriteria.exitingOversold,
+// },
+// {
+//   testType: testTypes.heatmap200WeekMovingAverage,
+//   criteria: heatmap200WeekCriteria.exitingOverbought,
+// },
+// {
+//   testType: testTypes.mvrvZScore,
+//   criteria: mvrvScoreCriteria.exitingOverbought,
+// },
+// {
+//   testType: testTypes.mvrvZScore,
+//   criteria: mvrvScoreCriteria.exitingExtremeOverbought,
+// },
+// {
+//   testType: testTypes.mvrvZScore,
+//   criteria: mvrvScoreCriteria.exitingOversold,
+// },
+// {
+//   testType: testTypes.mvrvZScore,
+//   criteria: mvrvScoreCriteria.exitingExtremeOversold,
+// },
+// {
+//   testType: testTypes.puellMultiple,
+//   criteria: puellMultipleCriteria.exitingOverbought,
+// },
+// {
+//   testType: testTypes.puellMultiple,
+//   criteria: puellMultipleCriteria.exitingOversold,
+// },
+// {
+//   testType: testTypes.logarithmic,
+//   criteria: logarithmicCriteria.exitingOverbought,
+// },
+// {
+//   testType: testTypes.logarithmic,
+//   criteria: logarithmicCriteria.approachingResistance,
+// },
+// {
+//   testType: testTypes.logarithmic,
+//   criteria: logarithmicCriteria.retracingResistance,
+// },
+// {
+//   testType: testTypes.logarithmic,
+//   criteria: logarithmicCriteria.exitingOversold,
+// },
+// {
+//   testType: testTypes.relativeUnrealized,
+//   criteria:
+//     relativeUnrealizedCriteria.enteringHopeFearFromBelow,
+// },
+// {
+//   testType: testTypes.relativeUnrealized,
+//   criteria:
+//     relativeUnrealizedCriteria.enteringHopeFearFromAbove,
+// },
+// {
+//   testType: testTypes.relativeUnrealized,
+//   criteria:
+//     relativeUnrealizedCriteria.enteringOptimismDenialFromBelow,
+// },
+// {
+//   testType: testTypes.relativeUnrealized,
+//   criteria:
+//     relativeUnrealizedCriteria.enteringOptimismDenialFromAbove,
+// },

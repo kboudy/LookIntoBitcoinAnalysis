@@ -437,22 +437,71 @@ const relativeUnrealized = (date, criteria) => {
   }
 };
 
-exports.testCriteriaCombinations = {
-  bitcoinInvestor_enteringOverbought: [
-    {
-      testType: testTypes.bitcoinInvestor,
-      criteria: bitcoinInvestorCriteria.enteringOverbought,
-      bullish: false,
-      daysSince: [0, 5],
-    },
-    null,
-  ],
+exports.bullishTestCriteriaCombinations = {
   bitcoinInvestor_enteringOversold: [
     {
       testType: testTypes.bitcoinInvestor,
       criteria: bitcoinInvestorCriteria.enteringOversold,
-      bullish: true,
-      daysSince: [0, 5],
+      daysSince: 0,
+    },
+    null,
+  ],
+  heatmap200WeekMovingAverage_enteringOversold: [
+    {
+      testType: testTypes.heatmap200WeekMovingAverage,
+      criteria: heatmap200WeekCriteria.enteringOversold,
+      daysSince: 0,
+    },
+    null,
+  ],
+  mvrvZScore_enteringOversold: [
+    {
+      testType: testTypes.mvrvZScore,
+      criteria: mvrvScoreCriteria.enteringOversold,
+      daysSince: 0,
+    },
+    null,
+  ],
+  mvrvZScore_enteringExtremeOversold: [
+    {
+      testType: testTypes.mvrvZScore,
+      criteria: mvrvScoreCriteria.enteringExtremeOversold,
+      daysSince: 0,
+    },
+    null,
+  ],
+  puellMultiple_enteringOversold: [
+    {
+      testType: testTypes.puellMultiple,
+      criteria: puellMultipleCriteria.enteringOversold,
+      daysSince: 0,
+    },
+    null,
+  ],
+  logarithmic_enteringOversold: [
+    {
+      testType: testTypes.logarithmic,
+      criteria: logarithmicCriteria.enteringOversold,
+      daysSince: 0,
+    },
+    null,
+  ],
+  relativeUnrealized_enteringCapitulation: [
+    {
+      testType: testTypes.logarithmic,
+      criteria: logarithmicCriteria.enteringCapitulation,
+      daysSince: 0,
+    },
+    null,
+  ],
+};
+
+exports.bearishTestCriteriaCombinations = {
+  bitcoinInvestor_enteringOverbought: [
+    {
+      testType: testTypes.bitcoinInvestor,
+      criteria: bitcoinInvestorCriteria.enteringOverbought,
+      daysSince: 0,
     },
     null,
   ],
@@ -460,18 +509,7 @@ exports.testCriteriaCombinations = {
     {
       testType: testTypes.heatmap200WeekMovingAverage,
       criteria: heatmap200WeekCriteria.enteringOverbought,
-      bullish: false,
-      daysSince: [0, 5],
-    },
-    null,
-  ],
-
-  heatmap200WeekMovingAverage_enteringOversold: [
-    {
-      testType: testTypes.heatmap200WeekMovingAverage,
-      criteria: heatmap200WeekCriteria.enteringOversold,
-      bullish: true,
-      daysSince: [0, 5],
+      daysSince: 0,
     },
     null,
   ],
@@ -480,8 +518,7 @@ exports.testCriteriaCombinations = {
     {
       testType: testTypes.mvrvZScore,
       criteria: mvrvScoreCriteria.enteringOverbought,
-      bullish: false,
-      daysSince: [0, 5],
+      daysSince: 0,
     },
     null,
   ],
@@ -489,26 +526,7 @@ exports.testCriteriaCombinations = {
     {
       testType: testTypes.mvrvZScore,
       criteria: mvrvScoreCriteria.enteringExtremeOverbought,
-      bullish: false,
-      daysSince: [0, 5],
-    },
-    null,
-  ],
-  mvrvZScore_enteringOversold: [
-    {
-      testType: testTypes.mvrvZScore,
-      criteria: mvrvScoreCriteria.enteringOversold,
-      bullish: true,
-      daysSince: [0, 5],
-    },
-    null,
-  ],
-  mvrvZScore_enteringExtremeOversold: [
-    {
-      testType: testTypes.mvrvZScore,
-      criteria: mvrvScoreCriteria.enteringExtremeOversold,
-      bullish: true,
-      daysSince: [0, 5],
+      daysSince: 0,
     },
     null,
   ],
@@ -516,8 +534,7 @@ exports.testCriteriaCombinations = {
     {
       testType: testTypes.goldenRatio,
       criteria: goldenRatioCriteria.enteringExtremeOversold,
-      bullish: false,
-      daysSince: [0, 5],
+      daysSince: 0,
     },
     null,
   ],
@@ -525,8 +542,7 @@ exports.testCriteriaCombinations = {
     {
       testType: testTypes.goldenRatio,
       criteria: goldenRatioCriteria.reachingPotentialCycleHighZone,
-      bullish: false,
-      daysSince: [0, 5],
+      daysSince: 0,
     },
     null,
   ],
@@ -534,8 +550,7 @@ exports.testCriteriaCombinations = {
     {
       testType: testTypes.piCycleTop,
       criteria: null,
-      bullish: false,
-      daysSince: [0, 5],
+      daysSince: 0,
     },
     null,
   ],
@@ -543,17 +558,7 @@ exports.testCriteriaCombinations = {
     {
       testType: testTypes.puellMultiple,
       criteria: puellMultipleCriteria.enteringOverbought,
-      bullish: false,
-      daysSince: [0, 5],
-    },
-    null,
-  ],
-  puellMultiple_enteringOversold: [
-    {
-      testType: testTypes.puellMultiple,
-      criteria: puellMultipleCriteria.enteringOversold,
-      bullish: true,
-      daysSince: [0, 5],
+      daysSince: 0,
     },
     null,
   ],
@@ -561,26 +566,7 @@ exports.testCriteriaCombinations = {
     {
       testType: testTypes.logarithmic,
       criteria: logarithmicCriteria.enteringOverbought,
-      bullish: false,
-      daysSince: [0, 5],
-    },
-    null,
-  ],
-  logarithmic_enteringOversold: [
-    {
-      testType: testTypes.logarithmic,
-      criteria: logarithmicCriteria.enteringOversold,
-      bullish: true,
-      daysSince: [0, 5],
-    },
-    null,
-  ],
-  relativeUnrealized_enteringCapitulation: [
-    {
-      testType: testTypes.logarithmic,
-      criteria: logarithmicCriteria.enteringCapitulation,
-      bullish: true,
-      daysSince: [0, 5],
+      daysSince: 0,
     },
     null,
   ],
@@ -588,8 +574,7 @@ exports.testCriteriaCombinations = {
     {
       testType: testTypes.logarithmic,
       criteria: logarithmicCriteria.enteringGreed,
-      bullish: false,
-      daysSince: [0, 5],
+      daysSince: 0,
     },
     null,
   ],

@@ -71,7 +71,7 @@ const testTypes = {
 };
 exports.testTypes = testTypes;
 
-exports.runIndicatorTest = (testType, date, criteria) => {
+exports.runIndicatorTest = (date, testType, criteria) => {
   switch (testType) {
     case testTypes.bitcoinInvestor:
       return bitcoinInvestor(date, criteria);
@@ -105,6 +105,7 @@ const bitcoinInvestorCriteria = {
   enteringOversold: "enteringOversold",
   exitingOversold: "exitingOversold",
 };
+exports.bitcoinInvestorCriteria = bitcoinInvestorCriteria;
 const bitcoinInvestor = (date, criteria) => {
   const previousDate = getPreviousDate(date);
   if (!previousDate) {
@@ -172,15 +173,15 @@ const heatmap200WeekMovingAverage = (date, criteria) => {
   }
   switch (criteria) {
     case heatmap200WeekCriteria.enteringOverbought:
-      const crossedAbove =
+      const eo_crossedAbove =
         heatmap_percentChange28DaysAgo[previousDate] < 14 &&
         heatmap_percentChange28DaysAgo[date] >= 14;
-      return crossedAbove;
+      return eo_crossedAbove;
     case heatmap200WeekCriteria.exitingOverbought:
-      const crossedBelow =
+      const xo_crossedBelow =
         heatmap_percentChange28DaysAgo[previousDate] > 14 &&
         heatmap_percentChange28DaysAgo[date] <= 14;
-      return crossedBelow;
+      return xo_crossedBelow;
     case heatmap200WeekCriteria.enteringOversold:
       const heatmap200Data = chartData[categories.heatmap200WeekMovingAverage];
       const previousPrice =

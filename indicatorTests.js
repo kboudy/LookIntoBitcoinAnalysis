@@ -488,8 +488,8 @@ exports.bullishTestCriteriaCombinations = {
   ],
   relativeUnrealized_enteringCapitulation: [
     {
-      testType: testTypes.logarithmic,
-      criteria: logarithmicCriteria.enteringCapitulation,
+      testType: testTypes.relativeUnrealized,
+      criteria: relativeUnrealizedCriteria.enteringCapitulation,
       daysSince: 0,
     },
     null,
@@ -572,8 +572,8 @@ exports.bearishTestCriteriaCombinations = {
   ],
   relativeUnrealized_enteringGreed: [
     {
-      testType: testTypes.logarithmic,
-      criteria: logarithmicCriteria.enteringGreed,
+      testType: testTypes.relativeUnrealized,
+      criteria: relativeUnrealizedCriteria.enteringGreed,
       daysSince: 0,
     },
     null,

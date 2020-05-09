@@ -13,7 +13,7 @@ const _ = require("lodash"),
     getDates,
   } = require("./indicatorTests");
 
-const MAX_SIMULTANEOUS_TRADES = 20;
+const MAX_SIMULTANEOUS_TRADES = 2000;
 
 //returns the test results, per day, for every test/criteria combo
 // in the format of the "days since test passed", for flexibility
@@ -81,24 +81,25 @@ const getLegendCode = (indicatorLegend, indicatorKey, isBuy) => {
   await initialize();
   const daysSince_testResults = await getDaysSinceTestResults();
   const bullishCombinations = cartesian.getAllPossibleCombinations(
-    bullishTestCriteriaCombinations
+    bullishTestCriteriaCombinations,
+    100
   );
   const bearishCombinations = cartesian.getAllPossibleCombinations(
-    bearishTestCriteriaCombinations
+    bearishTestCriteriaCombinations,
+    100
   );
   // we now have:
   //  - all indicator test results, in the "days since test passed" format
   //  - every bullish test combo (for buy triggers)
   //  - every bearish test combo (for sell triggers)
   // so we'll run every bullish+bearish combo possibility and store the results
-  let i = 0;
   const chartData = await getChartData();
   const btcPriceData =
     chartData[categories.bitcoinInvestorTool][
       datasetNames.bitcoinInvestorTool.btcPrice
     ];
   const dates = Object.keys(btcPriceData)
-    .filter((d) => d > "2014-01-01")
+    .filter((d) => d > "2010-01-01")
     .sort();
 
   const results = [];
@@ -106,7 +107,15 @@ const getLegendCode = (indicatorLegend, indicatorKey, isBuy) => {
   const indicatorLegend = {};
 
   for (const bullishCombination of bullishCombinations) {
+    if (Object.keys(bullishCombination).length < 7) {
+      // note - the "7" above - currently only running the set with max indicators
+      continue;
+    }
     for (const bearishCombination of bearishCombinations) {
+      if (Object.keys(bearishCombination).length < 10) {
+        // note - the "10" above - currently only running the set with max indicators
+        continue;
+      }
       let activeTrades = [];
       const completedTrades = [];
 
@@ -116,7 +125,11 @@ const getLegendCode = (indicatorLegend, indicatorKey, isBuy) => {
           for (const k of Object.keys(bullishCombination)) {
             const { daysSince } = bullishCombination[k];
             if (todayResults[k] <= daysSince) {
-              activeTrades.push({ buyDate: dt, buyPrice: btcPriceData[dt] });
+              activeTrades.push({
+                buyDate: dt,
+                buyPrice: btcPriceData[dt],
+                buyReason: k,
+              });
               break;
             }
           }
@@ -136,6 +149,7 @@ const getLegendCode = (indicatorLegend, indicatorKey, isBuy) => {
                 moment(trade.buyDate, "YYYY-MM-DD"),
                 "days"
               );
+              trade.sellReason = k;
               trade.profitLossPercent = parseFloat(
                 (
                   ((trade.sellPrice - trade.buyPrice) / trade.buyPrice) *
@@ -153,6 +167,29 @@ const getLegendCode = (indicatorLegend, indicatorKey, isBuy) => {
       if (completedTrades.length === 0) {
         continue;
       }
+      let completedTradeCSVOutput =
+        "buy date,sell date,day count,buy price,sell price,profit/loss %,buy indicator,buy criteria,sell indicator,sell criteria\n";
+      for (const ct of completedTrades) {
+        completedTradeCSVOutput += `${ct.buyDate},${ct.sellDate},${
+          ct.dayCount
+        },${ct.buyPrice.toFixed(2)},${ct.sellPrice.toFixed(2)},${
+          ct.profitLossPercent
+        },${ct.buyReason.split("_")[0]},${ct.buyReason.split("_")[1]},${
+          ct.sellReason.split("_")[0]
+        },${ct.sellReason.split("_")[1]}\n`;
+      }
+      fs.writeFileSync("completedTrades.csv", completedTradeCSVOutput, "utf8");
+
+      let activeTradeCSVOutput =
+        "buy date,buy price,buy indicator,buy criteria\n";
+      for (const aTrade of activeTrades) {
+        activeTradeCSVOutput += `${aTrade.buyDate},${aTrade.buyPrice.toFixed(
+          2
+        )},${aTrade.buyReason.split("_")[0]},${
+          aTrade.buyReason.split("_")[1]
+        }\n`;
+      }
+      fs.writeFileSync("activeTrades.csv", activeTradeCSVOutput, "utf8");
 
       const result = {};
       for (const k of Object.keys(bullishCombination)) {
@@ -180,9 +217,6 @@ const getLegendCode = (indicatorLegend, indicatorKey, isBuy) => {
       result.maxTradeDate = _.maxBy(completedTrades, (t) => t.buyDate).buyDate;
       result.maxDaysHeld = _.maxBy(completedTrades, (t) => t.dayCount).dayCount;
       result.minDaysHeld = _.minBy(completedTrades, (t) => t.dayCount).dayCount;
-      result.tradeDates = completedTrades.map((ct) => {
-        return { buyDate: ct.buyDate, sellDate: ct.sellDate };
-      });
       result.percentProfitable =
         Math.round(
           (completedTrades.filter((t) => t.profitLossPercent > 0).length *
@@ -193,7 +227,6 @@ const getLegendCode = (indicatorLegend, indicatorKey, isBuy) => {
     }
   }
 
-  const resultsWithHighTradeCount = results.filter((r) => r.tradeCount > 10);
   fs.writeFileSync(
     "tradeResults.json",
     JSON.stringify({ results, indicatorLegend }),

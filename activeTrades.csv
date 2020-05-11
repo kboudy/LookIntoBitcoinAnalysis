@@ -1,0 +1,12 @@
+buy date,buy price,buy indicator,buy criteria
+2019-10-23,7458.04,bitcoinInvestor,enteringOversold
+2019-11-21,7612.28,bitcoinInvestor,enteringOversold
+2020-03-12,4959.31,bitcoinInvestor,enteringOversold
+2020-03-14,5145.17,heatmap200WeekMovingAverage,enteringOversold
+2020-03-16,5012.93,puellMultiple,enteringOversold
+2020-03-18,5392.49,puellMultiple,enteringOversold
+2020-03-22,5830.56,mvrvZScore,enteringOversold
+2020-03-25,6689.97,puellMultiple,enteringOversold
+2020-04-10,6859.82,bitcoinInvestor,enteringOversold
+2020-04-19,7150.24,bitcoinInvestor,enteringOversold
+2020-05-10,8715.03,logarithmic,enteringOversold
